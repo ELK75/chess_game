@@ -4,8 +4,8 @@ require_relative 'board.rb'
 
 def draw_instructions
 	puts "Instructions:"
-	puts "Enter moves like so: \"d2,d4\""
-	puts "Or like so: \"d2, d4\""
+	print "Enter your move in algebraic notation seperated"
+	puts " by a comma."
 	puts
 end
 
@@ -101,7 +101,7 @@ def play_game
 		start_loc, end_loc = get_user_input(game, board)
 		board.move_piece(start_loc, end_loc)
 		System.clear
-		game.is_in_check?(board)
+		puts 'cheers m8' if game.is_in_check?(board)
 		draw_instructions
 		board.draw_board
 		board.player_turn = board.player_turn == 1 ? 2 : 1

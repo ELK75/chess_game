@@ -28,6 +28,16 @@ class Game
 		all_legal_moves << legal_moves unless legal_moves.nil?
 	end
 
+
+	def is_king_being_attacked?(board, all_legal_moves)
+		all_legal_moves.each do |move|
+			piece = board.get_piece_given_position(move)
+			return true if piece.class.name == 'King' &&
+				board.is_opposing_piece?(move)
+		end
+		false
+	end
+
 	def is_in_check?(board)
 
 	  all_legal_moves = []
@@ -42,7 +52,9 @@ class Game
 			end
 		end
 
-		all_legal_moves.flatten!(1).to_s
+		all_legal_moves.flatten!(1)
+
+		return is_king_being_attacked?(board, all_legal_moves)
 
 	end
 
