@@ -220,6 +220,7 @@ def play_game
 		start_loc, end_loc = get_user_input(board)
 		board.move_piece(start_loc, end_loc)
 		System.clear
+		draw_instructions
 		board.draw_board
 		board.player_turn = board.player_turn == 1 ? 2 : 1
 	end

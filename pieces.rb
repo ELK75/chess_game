@@ -26,8 +26,13 @@ class Piece
 		return pieces[piece]
 	end
 
+	def is_coords_legal?(coords)
+		return (is_legal?(coords[0]) && is_legal?(coords[1]))
+	end
+
 	def is_legal?(loc)
 		return false if loc > 7 || loc < 0
+		true
 	end
 
 	def remove_out_of_bounds
@@ -139,7 +144,6 @@ class Rook < Piece
 	end
 
 	def get_legal_moves(board, start_loc)
-		@legal_moves = []
 		add_horizontal(board, start_loc)
 		add_verticle(board, start_loc)
 		@legal_moves
@@ -149,6 +153,21 @@ end
 
 class Knight < Piece
 
+	def get_legal_moves(board, start_loc)
+		@legal_moves = []
+		move_array = [[2, 1], [2, -1], [-2, 1], [-2, -1],
+								  [1, 2], [1, -2], [-1, 2], [-1, -2]]
+		move_array.each do |move|
+			possible_move = [start_loc[0] + move[0], start_loc[1] + move[1]] 
+			if is_coords_legal?(possible_move)
+				unless board.get_piece_given_position(possible_move).nil?
+					next unless board.is_opposing_piece?(possible_move)
+				end
+				@legal_moves << possible_move
+			end
+		end
+		@legal_moves
+	end
 end
 
 class Bishop < Piece
