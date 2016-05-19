@@ -86,17 +86,13 @@ end
 
 class Rook < Piece
 
-	def is_in_bounds?(loc)
-		return (loc >= 0 && loc <= 7)
-	end
-
 	def add_on_one_side(board, start_loc, change_in_col)
 		row = board.board[start_loc[0]]
 		# + change_in_col since it has to start on the
 		# left or right side of the rook to find all the
 		# valid positions
 		column = start_loc[1] + change_in_col
-		while is_in_bounds?(column)
+		while is_legal?(column)
 			# breaks when the rook hits a piece
 			break if (!row[column].nil?)
 			@legal_moves << [start_loc[0], column]
@@ -106,7 +102,7 @@ class Rook < Piece
 		# adds the last piece if the it is an opposing
 		# piece
 		loc = [start_loc[0], column]
-		if is_in_bounds?(column) && board.is_opposing_piece?(loc)
+		if is_legal?(column) && board.is_opposing_piece?(loc)
 			@legal_moves << loc
 		end
 	end
@@ -121,7 +117,7 @@ class Rook < Piece
 	def add_in_one_direction(board, start_loc, change_in_row)
 		row = start_loc[0] + change_in_row
 		col = start_loc[1]
-		while is_in_bounds?(row)
+		while is_legal?(row)
 			# breaks when the rook hits a piece
 			break if (!board.board[row][col].nil?)
 			@legal_moves << [row, col]
@@ -131,7 +127,7 @@ class Rook < Piece
 		# adds the last piece if the it is an opposing
 		# piece
 		loc = [row, col]
-		if is_in_bounds?(row) && board.is_opposing_piece?(loc)
+		if is_legal?(row) && board.is_opposing_piece?(loc)
 			@legal_moves << loc
 		end
 	end
@@ -172,12 +168,77 @@ end
 
 class Bishop < Piece
 
+	def get_legal_moves(board, start_loc)
+
+		change_in_row_and_col = [[1, 1], [1, -1],
+														[-1, 1], [-1, -1]]
+
+		change_in_row_and_col.each do |change|
+			change_in_row = change[0]
+			change_in_col = change[1]
+			row = start_loc[0] + change_in_row
+			col = start_loc[1] + change_in_col
+			while is_coords_legal?([row, col])
+				break unless board.board[row][col].nil?
+				@legal_moves << [row, col]
+				row += change_in_row
+				col += change_in_col
+			end
+
+			# adds coords if it can capture the other
+			# piece
+
+			coords = [row, col]
+			if is_coords_legal?(coords) && board.is_opposing_piece?(coords)
+				@legal_moves << coords
+			end
+
+ 		end
+ 		@legal_moves
+	end
+
 end
 
 class Queen < Piece
 
+	def get_legal_moves(board, start_loc)
+		# gets the legal moves by initializing a rook
+		# and a bishop and combining their legal moves
+		@legal_moves = nil
+		color = board.get_player_color
+		bishop_moves = Bishop.new(color).get_legal_moves(board, start_loc)
+		rook_moves = Rook.new(color).get_legal_moves(board, start_loc)
+		@legal_moves = bishop_moves + rook_moves
+		@legal_moves
+	end
+
 end
 
 class King < Piece
+
+	def get_legal_moves(board, start_loc)
+
+		@legal_moves = []
+
+		moves = [[1, 1], [1, 0], [1, -1], [0, -1],
+					   [-1, -1], [-1, 0], [-1, 1], [0, 1]]
+
+		moves.each do |move|
+			new_move = [start_loc[0] + move[0], start_loc[1] + move[1]]
+			next unless is_coords_legal?(new_move)
+			piece = board.get_piece_given_position(new_move)
+			unless piece.nil?
+				if board.is_opposing_piece?(new_move)
+					@legal_moves << new_move
+				end
+				next
+			end
+			@legal_moves << new_move
+		end
+
+		@legal_moves
+
+	end
+
 
 end

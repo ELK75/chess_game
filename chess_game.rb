@@ -103,6 +103,12 @@ class Board < Game
 			return false
 		end
 	end
+
+
+	def get_player_color
+		return 'W' if @player_turn == 1
+		return 'B'
+	end
 end
 
 
