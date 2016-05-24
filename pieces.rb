@@ -52,32 +52,57 @@ end
 
 class Pawn < Piece
 
+	def diagonal_is_legal?(board, first_diagonal)
+		# returns true if the coord is legal AND the location
+		# has an enemy piece
+		if (is_coords_legal?(first_diagonal) && 
+			!board.get_piece_given_position(first_diagonal).nil? &&
+			board.is_opposing_piece?(first_diagonal))
+			return true
+		end
+		false
+	end
+
+	def add_diagonals(board, start_loc, change_in_row)
+
+		@legal_moves = []
+
+		first_diagonal = [start_loc[0]+change_in_row, start_loc[1]-1]
+		
+		# allows the pawn to move there if the spot if blank
+		# or the spot has an opposing piece
+		if diagonal_is_legal?(board, first_diagonal)
+			@legal_moves << [start_loc[0]+change_in_row, start_loc[1]-1]
+		end
+
+		second_diagonal = [start_loc[0]+change_in_row, start_loc[1]+1]
+		
+		if diagonal_is_legal?(board, second_diagonal)
+			@legal_moves << [start_loc[0]+change_in_row, start_loc[1]+1]
+		end
+
+		return @legal_moves
+
+	end
+
 	def get_moves_given_color(board, start_loc, color)
 		change_in_row = color == 'W' ? -1 : 1
 		starting_row = color == 'W' ? 6 : 1
 
-		two_moves_up = board[start_loc[0]+(change_in_row*2)][start_loc[1]]
+		add_diagonals(board, start_loc, change_in_row)
+
+		two_moves_up = board.board[start_loc[0]+(change_in_row*2)][start_loc[1]]
 		if two_moves_up.nil? && start_loc[0] == starting_row
 			@legal_moves << [start_loc[0]+(change_in_row*2), start_loc[1]]
 		end
 
-		position_in_front = board[start_loc[0]+change_in_row][start_loc[1]]
+		position_in_front = board.board[start_loc[0]+change_in_row][start_loc[1]]
 		@legal_moves << [start_loc[0]+change_in_row, start_loc[1]] if position_in_front.nil?
-			
-		first_diagonal = board[start_loc[0]+change_in_row][start_loc[1]-1]
-		if !first_diagonal.nil? && first_diagonal.color != color
-			@legal_moves << [start_loc[0]+change_in_row, start_loc[1]-1]
-		end
-
-		second_diagonal = board[start_loc[0]+change_in_row][start_loc[1]+1]
-		if !second_diagonal.nil? && second_diagonal.color != color
-			@legal_moves << [start_loc[0]+change_in_row, start_loc[1]+1]
-		end
 	end
 
 	def get_legal_moves(board, start_loc)
 		@legal_moves = []
-		get_moves_given_color(board.board, start_loc, @color)
+		get_moves_given_color(board, start_loc, @color)
 		remove_out_of_bounds
 		@legal_moves
 	end

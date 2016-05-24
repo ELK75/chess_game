@@ -13,8 +13,41 @@ class Game
 		false
 	end
 
+	# ex: [0, 0] turns into a1
+	def coords_to_standard_notation(move)
+		return "#{('a'..'h').to_a[move[1]]}#{8-move[0]}"
+	end
+
+	def add_all_legal_moves(board, piece, coords, all_legal_moves)
+		change_in_row = piece.color == 'W' ? -1 : 1
+		if piece.class.name == 'Pawn'
+			legal_moves = piece.add_diagonals(board, coords, change_in_row)
+		else
+			legal_moves = piece.get_legal_moves(board, coords)
+		end
+		all_legal_moves << legal_moves unless legal_moves.nil?
+	end
+
+	def is_in_check?(board)
+
+	  all_legal_moves = []
+
+		(0..7).each do |row|
+			(0..7).each do |col|
+				coords = [row, col]
+				piece = board.board[row][col]
+				if piece != nil && board.is_friendly_piece?(coords)
+					add_all_legal_moves(board, piece, coords, all_legal_moves)
+				end
+			end
+		end
+
+		all_legal_moves.flatten!(1).to_s
+
+	end
+
+
 	def save_game 
-	
 	end
 
 end
@@ -104,9 +137,14 @@ class Board < Game
 		end
 	end
 
+	# whether or not a piece is of the same
+	# color. AKA friendly
+	def is_friendly_piece?(location)
+		return !is_opposing_piece?(location)
+	end
+
 	def get_player_color
 		return 'W' if @player_turn == 1
 		return 'B'
 	end
-
 end

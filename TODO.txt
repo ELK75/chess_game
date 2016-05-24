@@ -1,0 +1,17 @@
+- make it so that if a piece cant be move (like trying to move the rook on the first move), it says the move is invalid
+
+- clean user input so the user can put a2,a4 as valid input
+
+- can't move to the same position
+
+- getting a pawn to the end allows you to switch it out for a queen or another piece
+
+- castling except when king is in check or when castling would put the king in check
+
+- en passant but make sure it occurs immediately after a player has moved two moves up
+
+- king can't put himself in check
+
+- pieces can block a check
+
+- may be problem where both kings are in check
