@@ -18,16 +18,19 @@ class Game
 		return "#{('a'..'h').to_a[move[1]]}#{8-move[0]}"
 	end
 
-	def add_all_legal_moves(board, piece, coords, all_legal_moves)
-		change_in_row = piece.color == 'W' ? -1 : 1
-		if piece.class.name == 'Pawn'
-			legal_moves = piece.add_diagonals(board, coords, change_in_row)
-		else
-			legal_moves = piece.get_legal_moves(board, coords)
+	def remove_straight_pawn_attacks(board, all_legal_moves)
+		all_pieces = board.get_all_pieces
+		all_pieces.each do |piece|
+			if piece.class.name == 'Pawn'
+				
+			end
 		end
-		all_legal_moves << legal_moves unless legal_moves.nil?
 	end
 
+	def add_all_legal_moves(board, piece, coords, all_legal_moves)
+		legal_moves = piece.get_legal_moves(board, coords)
+		all_legal_moves << legal_moves unless legal_moves.nil?
+	end
 
 	def is_king_being_attacked?(board, all_legal_moves)
 		all_legal_moves.each do |move|
@@ -38,24 +41,36 @@ class Game
 		false
 	end
 
-	def is_in_check?(board)
+	def get_all_legal_moves(board, target_color)
+		all_legal_moves = []
 
-	  all_legal_moves = []
+		all_pieces = board.get_all_pieces
 
-		(0..7).each do |row|
-			(0..7).each do |col|
-				coords = [row, col]
-				piece = board.board[row][col]
-				if piece != nil && board.is_friendly_piece?(coords)
-					add_all_legal_moves(board, piece, coords, all_legal_moves)
-				end
+		all_pieces.each do |piece|
+			if piece != nil && piece.color == target_color
+				add_all_legal_moves(board, piece, coords, all_legal_moves)
 			end
 		end
 
-		all_legal_moves.flatten!(1)
+		return all_legal_moves.flatten!(1)
+	end
 
+	def is_in_check?(board)
+		target_color = board.get_player_color
+		all_legal_moves = get_all_legal_moves(board, target_color)
+		remove_straight_pawn_attack(board, all_legal_moves)
 		return is_king_being_attacked?(board, all_legal_moves)
+	end
 
+	def is_in_check_mate?(board)
+		if is_in_check(board)
+			current_player_color = board.get_player_color
+			all_legal_moves = get_all_legal_moves(board, current_player_color)
+			current_board = board.board
+			all_legal_moves.each do |move|
+
+			end
+		end
 	end
 
 
@@ -159,4 +174,16 @@ class Board < Game
 		return 'W' if @player_turn == 1
 		return 'B'
 	end
+
+	def get_all_pieces
+		pieces = []
+		@board.each do |row|
+			row.each do |piece|
+				pieces << piece unless piece.nil?
+			end
+		end
+
+		return pieces
+	end
+
 end
